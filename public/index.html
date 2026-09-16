@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+  <!-- Subtle background glow -->
+  <div class="absolute top-[-10%] left-[-10%] w-[45rem] h-[45rem] bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[45rem] h-[45rem] bg-violet-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <main class="w-full max-w-md bg-slate-800/90 border border-slate-700/80 rounded-2xl shadow-2xl p-8 backdrop-blur-xl relative z-10">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 mb-3 shadow-inner">
+        <i class="fa-solid fa-graduation-cap text-3xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-white">Student Information Portal</h1>
+      <p class="text-sm text-slate-400 mt-1">Sign in with your Roll Number & Password</p>
+    </div>
+
+    <!-- Alert / Message container -->
+    <div id="alertBox" class="hidden mb-6 p-4 rounded-xl text-sm flex items-start gap-3 border transition-all"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label for="roll_no" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+          User ID / Roll Number
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+            <i class="fa-solid fa-id-card"></i>
+          </span>
+          <input 
+            type="text" 
+            id="roll_no" 
+            name="roll_no" 
+            required 
+            placeholder="e.g. 2024CS001 or admin" 
+            class="w-full bg-slate-900/80 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-500 outline-none transition text-sm"
+          >
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+            Password
+          </label>
+        </div>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+            <i class="fa-solid fa-lock"></i>
+          </span>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            placeholder="••••••••" 
+            class="w-full bg-slate-900/80 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 rounded-xl py-3 pl-11 pr-11 text-white placeholder-slate-500 outline-none transition text-sm"
+          >
+          <button 
+            type="button" 
+            id="togglePassword" 
+            class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-200 transition"
+          >
+            <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        id="loginSubmitBtn"
+        class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+      >
+        <span>Sign In</span>
+        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+      </button>
+    </form>
+
+    <!-- Quick Credentials Helper for Testing / Demo -->
+    <div class="mt-8 pt-6 border-t border-slate-700/60">
+      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">Quick Demo Logins</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button 
+          type="button" 
+          onclick="fillDemo('admin', 'admin123')"
+          class="flex items-center gap-2 px-3 py-2 bg-slate-900/90 hover:bg-slate-700 border border-slate-700/80 rounded-lg text-xs font-medium text-slate-300 transition text-left"
+        >
+          <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+          <div>
+            <div class="font-semibold text-indigo-300">Admin</div>
+            <div class="text-[10px] text-slate-400">Full control</div>
+          </div>
+        </button>
+
+        <button 
+          type="button" 
+          onclick="fillDemo('2024CS001', 'pass@2024CS001')"
+          class="flex items-center gap-2 px-3 py-2 bg-slate-900/90 hover:bg-slate-700 border border-slate-700/80 rounded-lg text-xs font-medium text-slate-300 transition text-left"
+        >
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <div>
+            <div class="font-semibold text-emerald-300">Student 1</div>
+            <div class="text-[10px] text-slate-400">94% Attendance</div>
+          </div>
+        </button>
+
+        <button 
+          type="button" 
+          onclick="fillDemo('2024CS003', 'pass@2024CS003')"
+          class="flex items-center gap-2 px-3 py-2 bg-slate-900/90 hover:bg-slate-700 border border-slate-700/80 rounded-lg text-xs font-medium text-slate-300 transition text-left col-span-2"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <div>
+            <div class="font-semibold text-amber-300">Student 2 (Low Attendance Demo)</div>
+            <div class="text-[10px] text-slate-400">64% Attendance (Warning Notice Triggered)</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Student Details Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+  
+  <!-- Navigation Bar -->
+  <nav class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+          <i class="fa-solid fa-shield-halved text-lg"></i>
+        </div>
+        <div>
+          <span class="text-base font-bold text-white tracking-tight">Admin Portal</span>
+          <span class="hidden sm:inline-block ml-2 px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Management Console</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 text-sm text-slate-300">
+          <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">
+            <i class="fa-solid fa-user-shield text-xs"></i>
+          </div>
+          <span id="adminName" class="font-medium hidden md:inline">Administrator</span>
+        </div>
+
+        <button 
+          id="logoutBtn"
+          class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-red-500/10 hover:text-red-400 text-slate-300 border border-slate-700 hover:border-red-500/30 transition duration-150 cursor-pointer"
+        >
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- Top Stats / Overview -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Students</p>
+          <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+        <h3 id="statTotalStudents" class="text-2xl font-bold text-white mt-2">--</h3>
+        <p class="text-xs text-slate-500 mt-1">Enrolled and active in database</p>
+      </div>
+
+      <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Average Attendance</p>
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+        </div>
+        <h3 id="statAvgAttendance" class="text-2xl font-bold text-emerald-400 mt-2">--%</h3>
+        <p class="text-xs text-slate-500 mt-1">Overall batch attendance rate</p>
+      </div>
+
+      <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Average CGPA</p>
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+        </div>
+        <h3 id="statAvgCgpa" class="text-2xl font-bold text-indigo-400 mt-2">--</h3>
+        <p class="text-xs text-slate-500 mt-1">Batch academic metric (/ 10.0)</p>
+      </div>
+
+      <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Attendance Alert</p>
+          <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+        </div>
+        <h3 id="statLowAttendance" class="text-2xl font-bold text-amber-400 mt-2">--</h3>
+        <p class="text-xs text-slate-500 mt-1">Students below 75% threshold</p>
+      </div>
+    </div>
+
+    <!-- Student Table Controls & Action Bar -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-white">Student Directory</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Manage student credentials, attendance records, and CGPA scores</p>
+        </div>
+
+        <button 
+          id="openAddStudentModalBtn"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition duration-150 cursor-pointer"
+        >
+          <i class="fa-solid fa-user-plus text-xs"></i>
+          <span>Add New Student</span>
+        </button>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          </span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search by student name or roll number..." 
+            class="w-full bg-slate-950/70 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 outline-none"
+          >
+        </div>
+
+        <select 
+          id="filterAttendance" 
+          class="bg-slate-950/70 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3 text-sm text-slate-300 outline-none"
+        >
+          <option value="all">All Attendance</option>
+          <option value="eligible">Eligible (&ge; 75%)</option>
+          <option value="low">Warning (&lt; 75%)</option>
+        </select>
+      </div>
+
+      <!-- Students Table -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800/80">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-slate-950/90 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider font-semibold">
+              <th class="py-3.5 px-4">Roll Number (ID)</th>
+              <th class="py-3.5 px-4">Student Name</th>
+              <th class="py-3.5 px-4">Department</th>
+              <th class="py-3.5 px-4">CGPA</th>
+              <th class="py-3.5 px-4">Attendance</th>
+              <th class="py-3.5 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody" class="divide-y divide-slate-800/60 bg-slate-900/40">
+            <!-- Dynamic rows injected here -->
+            <tr>
+              <td colspan="6" class="py-8 text-center text-slate-500">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading students...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Student Modal -->
+  <div id="addStudentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-6 relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center">
+            <i class="fa-solid fa-user-plus text-sm"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">Register New Student</h3>
+        </div>
+        <button type="button" id="closeAddModalBtn" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="addModalAlert" class="hidden my-4 p-3 rounded-xl text-xs flex items-center gap-2 border"></div>
+
+      <form id="addStudentForm" class="space-y-4 mt-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Roll Number (User ID) *</label>
+            <input 
+              type="text" 
+              id="newRoll" 
+              required 
+              placeholder="e.g. 2024CS005" 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-600 outline-none"
+            >
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Student Full Name *</label>
+            <input 
+              type="text" 
+              id="newName" 
+              required 
+              placeholder="e.g. Ananya Sen" 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-600 outline-none"
+            >
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">CGPA (0 - 10) *</label>
+            <input 
+              type="number" 
+              id="newCgpa" 
+              step="0.01" 
+              min="0" 
+              max="10" 
+              required 
+              placeholder="8.50" 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-600 outline-none"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Attendance (%) *</label>
+            <input 
+              type="number" 
+              id="newAttendance" 
+              step="0.1" 
+              min="0" 
+              max="100" 
+              required 
+              placeholder="85.0" 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-600 outline-none"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Department</label>
+            <input 
+              type="text" 
+              id="newDept" 
+              placeholder="Computer Science" 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-600 outline-none"
+            >
+          </div>
+        </div>
+
+        <!-- Password Generator Section -->
+        <div class="pt-2">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold uppercase text-slate-400">Password for Student *</label>
+            <button 
+              type="button" 
+              id="btnGeneratePass" 
+              class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Generate Password</span>
+            </button>
+          </div>
+          <div class="relative flex items-center">
+            <input 
+              type="text" 
+              id="newPassword" 
+              required 
+              placeholder="Type password or click Generate" 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white placeholder-slate-600 outline-none pr-24"
+            >
+            <div class="absolute right-1.5 flex items-center gap-1">
+              <button 
+                type="button" 
+                id="btnCopyGeneratedPass" 
+                title="Copy Password"
+                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition"
+              >
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1.5">Share this Roll Number and Password with the student for their portal login.</p>
+        </div>
+
+        <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+          <button 
+            type="button" 
+            id="cancelAddBtn" 
+            class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            id="submitAddStudentBtn"
+            class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition flex items-center gap-2"
+          >
+            <i class="fa-solid fa-check"></i>
+            <span>Create Student</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Student Modal -->
+  <div id="editStudentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-6 relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center">
+            <i class="fa-solid fa-user-pen text-sm"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">Edit Student Details</h3>
+        </div>
+        <button type="button" id="closeEditModalBtn" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="editModalAlert" class="hidden my-4 p-3 rounded-xl text-xs flex items-center gap-2 border"></div>
+
+      <form id="editStudentForm" class="space-y-4 mt-4">
+        <input type="hidden" id="editStudentId">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Roll Number (Fixed)</label>
+            <input 
+              type="text" 
+              id="editRoll" 
+              disabled 
+              class="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-500 cursor-not-allowed outline-none"
+            >
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Full Name *</label>
+            <input 
+              type="text" 
+              id="editName" 
+              required 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+            >
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">CGPA (0 - 10) *</label>
+            <input 
+              type="number" 
+              id="editCgpa" 
+              step="0.01" 
+              min="0" 
+              max="10" 
+              required 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Attendance (%) *</label>
+            <input 
+              type="number" 
+              id="editAttendance" 
+              step="0.1" 
+              min="0" 
+              max="100" 
+              required 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Department</label>
+            <input 
+              type="text" 
+              id="editDept" 
+              class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+            >
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold uppercase text-slate-400">Reset Password (Optional)</label>
+            <button 
+              type="button" 
+              id="btnGenerateEditPass" 
+              class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Generate New</span>
+            </button>
+          </div>
+          <input 
+            type="text" 
+            id="editPassword" 
+            placeholder="Leave blank to keep existing password" 
+            class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white placeholder-slate-600 outline-none"
+          >
+        </div>
+
+        <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+          <button 
+            type="button" 
+            id="cancelEditBtn" 
+            class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            id="submitEditStudentBtn"
+            class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition flex items-center gap-2"
+          >
+            <i class="fa-solid fa-save"></i>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteConfirmModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-6 relative">
+      <div class="text-center">
+        <div class="w-12 h-12 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+          <i class="fa-solid fa-trash-can text-xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white">Delete Student?</h3>
+        <p class="text-xs text-slate-400 mt-2">
+          Are you sure you want to delete <span id="deleteStudentName" class="font-semibold text-slate-200"></span> (<span id="deleteStudentRoll" class="font-mono text-slate-300"></span>)? This action cannot be undone.
+        </p>
+      </div>
+
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <button 
+          type="button" 
+          id="cancelDeleteBtn" 
+          class="w-1/2 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+        >
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          id="confirmDeleteBtn" 
+          class="w-1/2 py-2.5 rounded-xl text-xs font-semibold bg-red-600 hover:bg-red-500 text-white transition flex items-center justify-center gap-2"
+        >
+          <i class="fa-solid fa-trash-can text-xs"></i>
+          <span>Yes, Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
