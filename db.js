@@ -1,8 +1,20 @@
-const { DatabaseSync } = require('node:sqlite');
+const fs = require('node:fs');
 const path = require('node:path');
+const { DatabaseSync } = require('node:sqlite');
 const bcrypt = require('bcryptjs');
 
-const dbPath = path.join(__dirname, 'students.db');
+let dbPath = path.join(__dirname, 'students.db');
+if (process.env.VERCEL) {
+  dbPath = path.join('/tmp', 'students.db');
+  const seedDb = path.join(__dirname, 'students.db');
+  if (!fs.existsSync(dbPath) && fs.existsSync(seedDb)) {
+    try {
+      fs.copyFileSync(seedDb, dbPath);
+    } catch (e) {
+      console.warn('Could not copy seed db, will initialize fresh:', e);
+    }
+  }
+}
 const db = new DatabaseSync(dbPath);
 
 // Initialize schema

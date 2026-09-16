@@ -284,10 +284,14 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`===================================================`);
-  console.log(` Student Details & Attendance System running on:`);
-  console.log(` http://localhost:${PORT}`);
-  console.log(` http://127.0.0.1:${PORT}`);
-  console.log(`===================================================`);
-});
+if (require.main === module || !process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`===================================================`);
+    console.log(` Student Details & Attendance System running on:`);
+    console.log(` http://localhost:${PORT}`);
+    console.log(` http://127.0.0.1:${PORT}`);
+    console.log(`===================================================`);
+  });
+}
+
+module.exports = app;
